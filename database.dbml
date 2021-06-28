@@ -1,0 +1,76 @@
+Project vehicle_quotes {
+  database_type: 'PostgreSQL'
+  note: '''
+    # Vehicle Quotes Data Model
+  '''
+}
+
+table makes {
+  id int [pk, increment]
+  name text
+}
+
+table body_types {
+  id int [pk, increment]
+  name text
+}
+
+table sizes {
+  id int [pk, increment]
+  name text
+}
+
+table models {
+  id int [pk, increment]
+  name text
+  make_id int [ref: > makes.id]
+}
+
+table model_styles {
+  id int [pk, increment]
+  model_id int [ref: > models.id]
+  body_type_id int [ref: > body_types.id]
+  size_id int [ref: > sizes.id]
+}
+
+table model_style_years {
+  id int [pk, increment]
+  year varchar
+  model_style_id int [ref: > model_styles.id]
+}
+
+table quote_rules {
+  id int [pk, increment]
+  feature_type varchar
+  feature_value varchar
+  price_modifier int
+}
+
+table quote_overrides {
+  id int [pk, increment]
+  model_style_year_id int [ref: > model_style_years.id]
+  price int
+}
+
+table quotes {
+  id int [pk, increment]
+  model_style_year_id int [ref: > model_style_years.id]
+  body_type_id int [ref: > body_types.id]
+  size_id int [ref: > sizes.id]
+  year string
+  make string
+  model string
+  message string
+  it_moves bool
+  has_all_wheels bool
+  has_alloy_wheels bool
+  has_all_tires bool
+  has_key bool
+  has_title bool
+  requires_pickup bool
+  has_engine bool
+  has_transmission bool
+  has_complete_interior bool
+  offered_quote int
+  created_at datetime
+}
