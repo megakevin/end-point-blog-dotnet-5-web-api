@@ -1,3 +1,6 @@
+commonLabels:
+  environment: dev
+
 resources:
   - db/persistent-volume.yaml
   - db/persistent-volume-claim.yaml
