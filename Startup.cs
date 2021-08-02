@@ -68,7 +68,7 @@ namespace VehicleQuotes
                 });
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
