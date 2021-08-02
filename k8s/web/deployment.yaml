@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-quotes-web
+spec:
+  selector:
+    matchLabels:
+      app: vehicle-quotes-web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vehicle-quotes-web
+    spec:
+      containers:
+        - name: vehicle-quotes-web
+          image: vehicle-quotes-web
+          ports:
+            - containerPort: 5000
+              name: "http"
+            - containerPort: 5001
+              name: "https"
+          volumeMounts:
+            - mountPath: "/app"
+              name: vehicle-quotes-source-code-storage
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_PASSWORD
+            - name: CUSTOMCONNSTR_VehicleQuotesContext
+              value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "1"
+      volumes:
+        - name: vehicle-quotes-source-code-storage
+          persistentVolumeClaim:
+            claimName: vehicle-quotes-source-code-persisent-volume-claim

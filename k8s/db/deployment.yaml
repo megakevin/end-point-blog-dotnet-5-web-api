@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-quotes-db
+spec:
+  selector:
+    matchLabels:
+      app: vehicle-quotes-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vehicle-quotes-db
+    spec:
+      containers:
+        - name: vehicle-quotes-db
+          image: postgres:13
+          ports:
+            - containerPort: 5432
+              name: "postgres"
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: vehicle-quotes-postgres-data-storage
+          env:
+            # if not kustomize:
+            # - name: POSTGRES_DB
+            #   value: vehicle_quotes
+            # - name: POSTGRES_USER
+            #   value: vehicle_quotes
+            # - name: POSTGRES_PASSWORD
+            #   value: password
+            # if kustomize:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_PASSWORD
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "2"
+      volumes:
+        - name: vehicle-quotes-postgres-data-storage
+          persistentVolumeClaim:
+            claimName: vehicle-quotes-postgres-data-persisent-volume-claim
