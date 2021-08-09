@@ -1,15 +1,11 @@
-commonLabels:
-  environment: dev
+kind: Kustomization
 
 resources:
   - db/persistent-volume.yaml
   - db/persistent-volume-claim.yaml
   - db/service.yaml
   - db/deployment.yaml
-  - web/persistent-volume.yaml
-  - web/persistent-volume-claim.yaml
   - web/service.yaml
-  - web/deployment.yaml
 
 vars:
   - name: VEHICLE_QUOTES_DB_SERVICE_NAME
@@ -24,8 +20,3 @@ configMapGenerator:
       - POSTGRES_DB=vehicle_quotes
       - POSTGRES_USER=vehicle_quotes
       - POSTGRES_PASSWORD=password
-
-images:
-  - name: vehicle-quotes-web
-    newName: localhost:32000/vehicle-quotes-dev
-    newTag: registry

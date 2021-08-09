@@ -1,0 +1,20 @@
+kind: Kustomization
+
+commonLabels:
+  environment: dev
+
+bases:
+  - ../base
+
+patches:
+  - db/persistent-volume-host-path.yaml
+
+resources:
+  - web/persistent-volume.yaml
+  - web/persistent-volume-claim.yaml
+  - web/deployment.yaml
+
+images:
+  - name: vehicle-quotes-web
+    newName: localhost:32000/vehicle-quotes-dev
+    newTag: registry
