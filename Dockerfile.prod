@@ -1,0 +1,85 @@
+# Get up and running:
+#   docker build -f Dockerfile.prod -t vehicle-quotes-prod . && docker run -d --name vehicle-quotes-prod --network host vehicle-quotes-prod && docker exec -it vehicle-quotes-prod bash
+#
+# Build the image with:
+#   docker build -f Dockerfile.prod -t vehicle-quotes-prod .
+#
+# Run a container based on the image:
+#   docker run -d --name vehicle-quotes-prod --network host vehicle-quotes-prod
+#
+# Connect to the container:
+#   docker exec -it vehicle-quotes-prod bash
+#
+# dotnet dev-certs https
+#
+# Build the image:
+#   docker build . -f Dockerfile.prod -t localhost:32000/vehicle-quotes-prod:registry
+# Push to k8s registry:
+#   docker push localhost:32000/vehicle-quotes-prod:registry
+#
+# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.187.0/containers/dotnet/.devcontainer/base.Dockerfile
+
+# [Choice] .NET version: 5.0, 3.1, 2.1
+# ARG VARIANT="5.0"
+# FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-${VARIANT}
+
+# [Option] Install Node.js
+# ARG INSTALL_NODE="false"
+
+# [Option] Install Azure CLI
+# ARG INSTALL_AZURE_CLI="false"
+
+# [Optional] Uncomment this section to install additional OS packages.
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+#     && apt-get -y install --no-install-recommends postgresql-client-common postgresql-client
+
+# [Optional] Uncomment this line to install global node packages.
+# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+
+# Run the remaining commands as the "vscode" user
+# USER vscode
+
+# Install EF and code generator development tools
+# RUN dotnet tool install --global dotnet-ef
+# RUN dotnet tool install --global dotnet-aspnet-codegenerator
+# RUN echo 'export PATH="$PATH:/home/vscode/.dotnet/tools"' >> /home/vscode/.bashrc
+
+# WORKDIR /app
+
+# Prevent the container from closing automatically
+# ENTRYPOINT ["tail", "-f", "/dev/null"]
+
+# https://hub.docker.com/_/microsoft-dotnet
+ARG VARIANT="5.0"
+FROM mcr.microsoft.com/dotnet/sdk:${VARIANT}
+# AS build
+
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends postgresql-client-common postgresql-client
+
+RUN dotnet tool install --global dotnet-ef
+# RUN echo 'export PATH="$PATH:/home/vscode/.dotnet/tools"' >> /home/vscode/.bashrc
+
+RUN dotnet dev-certs https
+
+WORKDIR /source
+
+# copy csproj and restore as distinct layers
+# COPY *.sln .
+# COPY VehicleQuotes.csproj ./VehicleQuotes.csproj
+# RUN dotnet restore
+# RUN dotnet ef database update
+
+# copy everything else and build app
+COPY . .
+# WORKDIR /source
+# RUN dotnet publish -c release -o /app --no-restore
+
+# final stage/image
+# FROM mcr.microsoft.com/dotnet/aspnet:5.0
+# WORKDIR /app
+# COPY --from=build /app ./
+# ENTRYPOINT ["dotnet", "VehicleQuotes.dll"]
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+
