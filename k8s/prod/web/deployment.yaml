@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-quotes-web
+spec:
+  selector:
+    matchLabels:
+      app: vehicle-quotes-web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vehicle-quotes-web
+    spec:
+      initContainers:
+        - name: build
+          image: vehicle-quotes-web
+          workingDir: "/source"
+          # command:
+          #   - dotnet
+          #   - restore
+          #   - "-v"
+          #   - "n"
+          command: ["/bin/sh"]
+          args: ["-c", "dotnet restore -v n && dotnet publish -c release -o /app --no-restore"]
+          volumeMounts:
+            - mountPath: "/app"
+              name: vehicle-quotes-source-code-storage
+        # - name: copy
+        #   image: vehicle-quotes-web
+        #   command:
+        #     - cp
+        #     - "-a"
+        #     - "/source/."
+        #     - "/app/"
+        #   volumeMounts:
+        #     - mountPath: "/app"
+        #       name: vehicle-quotes-source-code-storage
+        # - name: build
+        #   image: vehicle-quotes-web
+        #   workingDir: "/app"
+        #   command:
+        #     - dotnet
+        #     - build
+        #     - "-v"
+        #     - "n"
+        #   volumeMounts:
+        #     - mountPath: "/app"
+        #       name: vehicle-quotes-source-code-storage
+        # - name: database-update
+        #   image: vehicle-quotes-web
+        #   command:
+        #     - dotnet
+        #     - ef
+        #     - database
+        #     - update
+        #   volumeMounts:
+        #     - mountPath: "/app"
+        #       name: vehicle-quotes-source-code-storage
+        #   env:
+        #     - name: POSTGRES_DB
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: postgres-config
+        #           key: POSTGRES_DB
+        #     - name: POSTGRES_USER
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: postgres-config
+        #           key: POSTGRES_USER
+        #     - name: POSTGRES_PASSWORD
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: postgres-config
+        #           key: POSTGRES_PASSWORD
+        #     - name: CUSTOMCONNSTR_VehicleQuotesContext
+        #       value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
+      containers:
+        - name: vehicle-quotes-web
+          image: vehicle-quotes-web
+          workingDir: "/app"
+          # command:
+          #   - dotnet
+          #   - VehicleQuotes.dll
+          command: ["/bin/sh"]
+          args: ["-c", "dotnet VehicleQuotes.dll --urls=https://0.0.0.0:5001/"]
+          ports:
+            # - containerPort: 5000
+            #   name: "http"
+            - containerPort: 5001
+              name: "https"
+          volumeMounts:
+            - mountPath: "/app"
+              name: vehicle-quotes-source-code-storage
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_PASSWORD
+            - name: CUSTOMCONNSTR_VehicleQuotesContext
+              value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "1"
+      volumes:
+        - name: vehicle-quotes-source-code-storage
+          emptyDir: {}
