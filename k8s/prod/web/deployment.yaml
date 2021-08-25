@@ -13,23 +13,18 @@ spec:
         app: vehicle-quotes-web
     spec:
       initContainers:
-        - name: build
-          image: vehicle-quotes-web
-          workingDir: "/source"
-          command: ["/bin/sh"]
-          args: ["-c", "dotnet restore -v n && dotnet publish -c release -o /app --no-restore"]
-          volumeMounts:
-            - mountPath: "/app"
-              name: vehicle-quotes-source-code-storage
         - name: await-db-ready
           image: postgres:13
           command: ["/bin/sh"]
           args: ["-c", "until pg_isready -h $(VEHICLE_QUOTES_DB_SERVICE_NAME) -p 5432; do echo waiting for database; sleep 2; done;"]
-        - name: database-update
+        - name: build
           image: vehicle-quotes-web
           workingDir: "/source"
           command: ["/bin/sh"]
-          args: ["-c", "dotnet-ef database update"]
+          args: ["-c", "dotnet restore -v n && dotnet ef database update && dotnet publish -c release -o /app --no-restore"]
+          volumeMounts:
+            - mountPath: "/app"
+              name: vehicle-quotes-source-code-storage
           env:
             - name: POSTGRES_DB
               valueFrom:
@@ -48,6 +43,33 @@ spec:
                   key: POSTGRES_PASSWORD
             - name: CUSTOMCONNSTR_VehicleQuotesContext
               value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
+        # - name: await-db-ready
+        #   image: postgres:13
+        #   command: ["/bin/sh"]
+        #   args: ["-c", "until pg_isready -h $(VEHICLE_QUOTES_DB_SERVICE_NAME) -p 5432; do echo waiting for database; sleep 2; done;"]
+        # - name: database-update
+        #   image: vehicle-quotes-web
+        #   workingDir: "/source"
+        #   command: ["/bin/sh"]
+        #   args: ["-c", "dotnet-ef database update"]
+        #   env:
+        #     - name: POSTGRES_DB
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: postgres-config
+        #           key: POSTGRES_DB
+        #     - name: POSTGRES_USER
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: postgres-config
+        #           key: POSTGRES_USER
+        #     - name: POSTGRES_PASSWORD
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: postgres-config
+        #           key: POSTGRES_PASSWORD
+        #     - name: CUSTOMCONNSTR_VehicleQuotesContext
+        #       value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
       containers:
         - name: vehicle-quotes-web
           image: vehicle-quotes-web
