@@ -49,7 +49,7 @@ spec:
           command: ["/bin/sh"]
           # TODO: TEST THIS AND FIX THIS TO NOT USE THIS VERBOSE COMMAND
           # https://stackoverflow.com/questions/57066856/command-dotnet-ef-not-found-in-net-core-3
-          args: ["-c", "/root/.dotnet/tools/dotnet-ef database update"]
+          args: ["-c", "dotnet-ef database update"]
           env:
             - name: POSTGRES_DB
               valueFrom:
