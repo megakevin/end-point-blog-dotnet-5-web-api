@@ -58,6 +58,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends postgresql-client-common postgresql-client
 
 RUN dotnet tool install --global dotnet-ef
+ENV PATH $PATH:/root/.dotnet/tools
 # RUN echo 'export PATH="$PATH:/home/vscode/.dotnet/tools"' >> /home/vscode/.bashrc
 
 RUN dotnet dev-certs https
