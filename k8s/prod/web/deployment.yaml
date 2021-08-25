@@ -25,30 +25,10 @@ spec:
           image: postgres:13
           command: ["/bin/sh"]
           args: ["-c", "until pg_isready -h $(VEHICLE_QUOTES_DB_SERVICE_NAME) -p 5432; do echo waiting for database; sleep 2; done;"]
-          # env:
-          #   - name: POSTGRES_DB
-          #     valueFrom:
-          #       configMapKeyRef:
-          #         name: postgres-config
-          #         key: POSTGRES_DB
-          #   - name: POSTGRES_USER
-          #     valueFrom:
-          #       configMapKeyRef:
-          #         name: postgres-config
-          #         key: POSTGRES_USER
-          #   - name: POSTGRES_PASSWORD
-          #     valueFrom:
-          #       configMapKeyRef:
-          #         name: postgres-config
-          #         key: POSTGRES_PASSWORD
-          #   - name: CUSTOMCONNSTR_VehicleQuotesContext
-          #     value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
         - name: database-update
           image: vehicle-quotes-web
           workingDir: "/source"
           command: ["/bin/sh"]
-          # TODO: TEST THIS AND FIX THIS TO NOT USE THIS VERBOSE COMMAND
-          # https://stackoverflow.com/questions/57066856/command-dotnet-ef-not-found-in-net-core-3
           args: ["-c", "dotnet-ef database update"]
           env:
             - name: POSTGRES_DB
@@ -68,67 +48,13 @@ spec:
                   key: POSTGRES_PASSWORD
             - name: CUSTOMCONNSTR_VehicleQuotesContext
               value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
-        # - name: copy
-        #   image: vehicle-quotes-web
-        #   command:
-        #     - cp
-        #     - "-a"
-        #     - "/source/."
-        #     - "/app/"
-        #   volumeMounts:
-        #     - mountPath: "/app"
-        #       name: vehicle-quotes-source-code-storage
-        # - name: build
-        #   image: vehicle-quotes-web
-        #   workingDir: "/app"
-        #   command:
-        #     - dotnet
-        #     - build
-        #     - "-v"
-        #     - "n"
-        #   volumeMounts:
-        #     - mountPath: "/app"
-        #       name: vehicle-quotes-source-code-storage
-        # - name: database-update
-        #   image: vehicle-quotes-web
-        #   command:
-        #     - dotnet
-        #     - ef
-        #     - database
-        #     - update
-        #   volumeMounts:
-        #     - mountPath: "/app"
-        #       name: vehicle-quotes-source-code-storage
-        #   env:
-        #     - name: POSTGRES_DB
-        #       valueFrom:
-        #         configMapKeyRef:
-        #           name: postgres-config
-        #           key: POSTGRES_DB
-        #     - name: POSTGRES_USER
-        #       valueFrom:
-        #         configMapKeyRef:
-        #           name: postgres-config
-        #           key: POSTGRES_USER
-        #     - name: POSTGRES_PASSWORD
-        #       valueFrom:
-        #         configMapKeyRef:
-        #           name: postgres-config
-        #           key: POSTGRES_PASSWORD
-        #     - name: CUSTOMCONNSTR_VehicleQuotesContext
-        #       value: Host=$(VEHICLE_QUOTES_DB_SERVICE_NAME);Database=$(POSTGRES_DB);Username=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD)
       containers:
         - name: vehicle-quotes-web
           image: vehicle-quotes-web
           workingDir: "/app"
-          # command:
-          #   - dotnet
-          #   - VehicleQuotes.dll
           command: ["/bin/sh"]
           args: ["-c", "dotnet VehicleQuotes.dll --urls=https://0.0.0.0:5001/"]
           ports:
-            # - containerPort: 5000
-            #   name: "http"
             - containerPort: 5001
               name: "https"
           volumeMounts:
