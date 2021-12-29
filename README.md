@@ -2,7 +2,7 @@ This is a demo application for a blog post about developing Web APIs with .NET 5
 
 Requires:
 1. .NET 5
-2. `dotnet tool install --global dotnet-ef`
+2. `dotnet tool install --global dotnet-ef`, `dotnet tool install --global dotnet-aspnet-codegenerator`
 3. PostgreSQL database called `vehicle_quotes` accessible with username `vehicle_quotes` and password `password`.
 
 If Docker is installed. You can create a new PostgreSQL instance with:
@@ -22,10 +22,17 @@ Connect to it with:
 ```
 docker exec -it vehicle-quote-postgres psql -U vehicle_quotes
 ```
-or
+
+or, from the app container
 
 ```
 psql -h localhost -U vehicle_quotes
+```
+
+or, if using docker compose
+
+```
+psql -h db -U vehicle_quotes
 ```
 
 Build database with: `dotnet ef database update`
