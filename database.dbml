@@ -35,14 +35,14 @@ table model_styles {
 
 table model_style_years {
   id int [pk, increment]
-  year varchar
+  year string
   model_style_id int [ref: > model_styles.id]
 }
 
 table quote_rules {
   id int [pk, increment]
-  feature_type varchar
-  feature_value varchar
+  feature_type string
+  feature_value string
   price_modifier int
 }
 
