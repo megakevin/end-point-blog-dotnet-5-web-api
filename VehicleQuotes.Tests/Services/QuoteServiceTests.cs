@@ -1,51 +1,30 @@
 using System;
 using System.Linq;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using VehicleQuotes.Models;
 using VehicleQuotes.ResourceModels;
 using VehicleQuotes.Services;
-// using Microsoft.Extensions.Logging;
+using VehicleQuotes.Tests.Fixtures;
 
-namespace VehicleQuotes.Tests
+namespace VehicleQuotes.Tests.Services
 {
-    public class QuoteServiceTests : IDisposable
+    public class QuoteServiceTests : IClassFixture<DatabaseFixture>, IDisposable
     {
         private IConfiguration configuration;
         private VehicleQuotesContext dbContext;
 
-        public QuoteServiceTests()
+        public QuoteServiceTests(DatabaseFixture fixture)
         {
-            var host = Host.CreateDefaultBuilder().Build();
-            configuration = host.Services.GetRequiredService<IConfiguration>();
+            configuration = fixture.Configuration;
+            dbContext = fixture.DbContext;
 
-            dbContext = CreateDbContext();
+            dbContext.Database.BeginTransaction();
         }
 
         public void Dispose()
         {
-            dbContext.Dispose();
-        }
-
-        private VehicleQuotesContext CreateDbContext()
-        {
-            var options = new DbContextOptionsBuilder<VehicleQuotesContext>()
-                .UseNpgsql(configuration.GetConnectionString("VehicleQuotesContext"))
-                // .UseNpgsql("Host=db;Database=vehicle_quotes_test;Username=vehicle_quotes;Password=password")
-                .UseSnakeCaseNamingConvention()
-                // .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
-                // .EnableSensitiveDataLogging()
-                .Options;
-
-            var context = new VehicleQuotesContext(options);
-
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-
-            return context;
+            dbContext.Database.RollbackTransaction();
         }
 
         [Fact]
