@@ -15,11 +15,14 @@ namespace VehicleQuotes.Tests
     public class QuoteServiceTests
     {
         private IConfiguration configuration;
+        private VehicleQuotesContext dbContext;
 
         public QuoteServiceTests()
         {
             var host = Host.CreateDefaultBuilder().Build();
             configuration = host.Services.GetRequiredService<IConfiguration>();
+
+            dbContext = CreateDbContext();
         }
 
         private VehicleQuotesContext CreateDbContext()
@@ -44,7 +47,6 @@ namespace VehicleQuotes.Tests
         public async void GetAllQuotesReturnsEmptyWhenThereIsNoDataStored()
         {
             // Given
-            var dbContext = CreateDbContext();
             var service = new QuoteService(dbContext, null);
 
             // When
@@ -58,8 +60,6 @@ namespace VehicleQuotes.Tests
         public async void GetAllQuotesReturnsTheStoredData()
         {
             // Given
-            var dbContext = CreateDbContext();
-
             var quote = new Quote
             {
                 OfferedQuote = 100,
@@ -106,7 +106,6 @@ namespace VehicleQuotes.Tests
         public async void CalculateQuoteStoresANewQuoteRecord()
         {
             // Given
-            var dbContext = CreateDbContext();
             var service = new QuoteService(dbContext, configuration);
 
             var quoteRequest = new QuoteRequest
