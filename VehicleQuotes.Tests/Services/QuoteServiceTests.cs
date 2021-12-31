@@ -12,7 +12,7 @@ using VehicleQuotes.Services;
 
 namespace VehicleQuotes.Tests
 {
-    public class QuoteServiceTests
+    public class QuoteServiceTests : IDisposable
     {
         private IConfiguration configuration;
         private VehicleQuotesContext dbContext;
@@ -23,6 +23,11 @@ namespace VehicleQuotes.Tests
             configuration = host.Services.GetRequiredService<IConfiguration>();
 
             dbContext = CreateDbContext();
+        }
+
+        public void Dispose()
+        {
+            dbContext.Dispose();
         }
 
         private VehicleQuotesContext CreateDbContext()
