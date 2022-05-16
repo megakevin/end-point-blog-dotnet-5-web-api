@@ -143,7 +143,7 @@ namespace VehicleQuotes.Services
                 HasTransmission = request.HasTransmission,
                 HasCompleteInterior = request.HasCompleteInterior,
 
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
         }
 

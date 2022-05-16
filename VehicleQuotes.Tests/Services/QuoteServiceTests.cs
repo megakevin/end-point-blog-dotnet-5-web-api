@@ -66,7 +66,7 @@ namespace VehicleQuotes.Tests.Services
                 HasTransmission = true,
                 HasCompleteInterior = true,
 
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             dbContext.Quotes.Add(quote);
