@@ -28,7 +28,7 @@ services:
       - .:/app
 
 volumes:
-    vehicle-quotes-postgres-data:
+  vehicle-quotes-postgres-data:
 
 networks:
-    vehicle-quotes-network:
+  vehicle-quotes-network:
