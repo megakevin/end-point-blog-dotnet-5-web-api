@@ -15,7 +15,7 @@ docker run -d \
     -e POSTGRES_DB=vehicle_quotes \
     -e POSTGRES_USER=vehicle_quotes \
     -e POSTGRES_PASSWORD=password \
-    postgres
+    postgres:14
 ```
 
 Connect to it with: 
