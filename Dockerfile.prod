@@ -13,7 +13,7 @@
 # Push to k8s registry:
 #   docker push localhost:32000/vehicle-quotes-prod:registry
 
-ARG VARIANT="5.0"
+ARG VARIANT="6.0"
 FROM mcr.microsoft.com/dotnet/sdk:${VARIANT}
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
