@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VehicleQuotes.Models;
 
 namespace VehicleQuotes
 {
-    public class VehicleQuotesContext : DbContext
+    public class VehicleQuotesContext : IdentityUserContext<IdentityUser>
     {
         public VehicleQuotesContext (DbContextOptions<VehicleQuotesContext> options)
             : base(options)
@@ -25,6 +27,8 @@ namespace VehicleQuotes
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Size>().HasData(
                 new Size { ID = 1, Name = "Subcompact" },
                 new Size { ID = 2, Name = "Compact" },
