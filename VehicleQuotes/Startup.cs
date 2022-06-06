@@ -31,6 +31,7 @@ namespace VehicleQuotes
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<Services.QuoteService>();
+            services.AddScoped<Services.JwtService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
