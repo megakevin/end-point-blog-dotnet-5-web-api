@@ -107,6 +107,7 @@ namespace VehicleQuotes
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
