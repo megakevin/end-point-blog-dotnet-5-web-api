@@ -25,6 +25,8 @@ namespace VehicleQuotes
 
         public DbSet<Quote> Quotes { get; set; }
 
+        public DbSet<UserApiKey> UserApiKeys { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
