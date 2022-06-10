@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
+using VehicleQuotes.Authentication.ApiKey;
 
 namespace VehicleQuotes
 {
@@ -88,7 +90,11 @@ namespace VehicleQuotes
                             Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])
                         )
                     };
-                });
+                })
+                .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+                    "ApiKey",
+                    options => { }
+                );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
