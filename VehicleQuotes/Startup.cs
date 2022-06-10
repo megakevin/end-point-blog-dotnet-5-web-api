@@ -34,6 +34,7 @@ namespace VehicleQuotes
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<Services.QuoteService>();
+            services.AddScoped<Services.ApiKeyService>();
             services.AddScoped<Services.JwtService>();
 
             services.AddControllers();
