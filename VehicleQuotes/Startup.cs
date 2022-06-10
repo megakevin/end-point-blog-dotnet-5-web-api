@@ -92,7 +92,7 @@ namespace VehicleQuotes
                     };
                 })
                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-                    "ApiKey",
+                    ApiKeyDefaults.AuthenticationScheme,
                     options => { }
                 );
         }
