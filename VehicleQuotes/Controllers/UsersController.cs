@@ -12,13 +12,16 @@ namespace VehicleQuotes.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly JwtService _jwtService;
+        private readonly ApiKeyService _apiKeyService;
 
         public UsersController(
             UserManager<IdentityUser> userManager,
-            JwtService jwtService
+            JwtService jwtService,
+            ApiKeyService apiKeyService 
         ) {
             _userManager = userManager;
             _jwtService = jwtService;
+            _apiKeyService = apiKeyService;
         }
 
         [HttpPost]
@@ -85,6 +88,34 @@ namespace VehicleQuotes.Controllers
             }
 
             var token = _jwtService.CreateToken(user);
+
+            return Ok(token);
+        }
+
+        // POST: api/Users/ApiKey
+        [HttpPost("ApiKey")]
+        public async Task<ActionResult> CreateApiKey(AuthenticationRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.FindByNameAsync(request.UserName);
+
+            if (user == null)
+            {
+                return BadRequest("Bad credentials");
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+
+            if (!isPasswordValid)
+            {
+                return BadRequest("Bad credentials");
+            }
+
+            var token = _apiKeyService.CreateApiKey(user);
 
             return Ok(token);
         }
