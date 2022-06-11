@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using VehicleQuotes.Models;
 using VehicleQuotes.ResourceModels;
 using VehicleQuotes.Services;
 
@@ -24,6 +26,7 @@ namespace VehicleQuotes.Controllers
             _apiKeyService = apiKeyService;
         }
 
+        // POST: api/Users
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
@@ -68,56 +71,54 @@ namespace VehicleQuotes.Controllers
         [HttpPost("BearerToken")]
         public async Task<ActionResult<AuthenticationResponse>> CreateBearerToken(AuthenticationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = await _userManager.FindByNameAsync(request.UserName);
-
-            if (user == null)
-            {
-                return BadRequest("Bad credentials");
-            }
-
-            var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-
-            if (!isPasswordValid)
-            {
-                return BadRequest("Bad credentials");
-            }
-
-            var token = _jwtService.CreateToken(user);
-
-            return Ok(token);
+            return await CreateAuthToken(request, user => _jwtService.CreateToken(user));
         }
 
         // POST: api/Users/ApiKey
         [HttpPost("ApiKey")]
-        public async Task<ActionResult> CreateApiKey(AuthenticationRequest request)
+        public async Task<ActionResult<UserApiKey>> CreateApiKey(AuthenticationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            return await CreateAuthToken(request, user => _apiKeyService.CreateApiKey(user));
+        }
 
-            var user = await _userManager.FindByNameAsync(request.UserName);
+        private async Task<ActionResult<TAuthTokenType>> CreateAuthToken<TAuthTokenType>(
+            AuthenticationRequest request,
+            Func<IdentityUser, TAuthTokenType> createToken
+        ) {
+            var user = await Authenticate(request);
 
             if (user == null)
             {
                 return BadRequest("Bad credentials");
             }
 
+            var token = createToken(user);
+
+            return Ok(token);
+        }
+
+        private async Task<IdentityUser> Authenticate(AuthenticationRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return null;
+            }
+
+            var user = await _userManager.FindByNameAsync(request.UserName);
+
+            if (user == null)
+            {
+                return null;
+            }
+
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
             if (!isPasswordValid)
             {
-                return BadRequest("Bad credentials");
+                return null;
             }
 
-            var token = _apiKeyService.CreateApiKey(user);
-
-            return Ok(token);
+            return user;
         }
     }
 }
