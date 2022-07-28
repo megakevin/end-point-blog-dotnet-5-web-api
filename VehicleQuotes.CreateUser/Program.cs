@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using VehicleQuotes.CreateUser;
 
 IHost host = Host.CreateDefaultBuilder(args)
+    .UseContentRoot(System.AppContext.BaseDirectory)
     .ConfigureServices((context, services) =>
     {
         var startup = new VehicleQuotes.Startup(context.Configuration);
